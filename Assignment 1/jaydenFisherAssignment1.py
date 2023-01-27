@@ -1,26 +1,26 @@
 #non recursive insert function
 
-def insert(num,tree):
-    oldtree=tree
-    newtree=None
+# def insert(num,tree):
+#     oldtree=tree
+#     newtree=None
 
-    while not isEmpty(tree):
-        newtree=oldtree
-        if oldtree.value > num:
-            oldtree=newtree.left
-        else:
-            oldtree=newtree.right
+#     while not isEmpty(tree):
+#         newtree=oldtree
+#         if oldtree.value > num:
+#             oldtree=newtree.left
+#         else:
+#             oldtree=newtree.right
 
-    if newtree==None:
-        newtree=makeTree(num, emptyTree(), emptyTree())
+#     if newtree==None:
+#         newtree=makeTree(num, emptyTree(), emptyTree())
 
-    elif newtree.value > num:
-        newtree.left=makeTree(num, emptyTree(), emptyTree())
+#     elif newtree.value > num:
+#         newtree.left=makeTree(num, emptyTree(), emptyTree())
 
-    else:
-        newtree.right=makeTree(num, emptyTree(), emptyTree())
+#     else:
+#         newtree.right=makeTree(num, emptyTree(), emptyTree())
 
-    return newtree
+#     return newtree
 
 
 #non recursive mergesort (used stack overflow for help)
@@ -66,6 +66,7 @@ def merge(A, left, middle, right):
         j += 1
         k+=1
 
+
 #frequency count
 
 def frequencyCount(A):
@@ -79,8 +80,9 @@ def frequencyCount(A):
             newlist.append([i,1])
             x+=1
         else:
-            newlist[x[1]]+=1
+            newlist[x][1]+=1
     return newlist
+
 
 #descendant and ancestor
 
@@ -97,7 +99,7 @@ def Descendant(element, tree):
     return descendants
 
 def Ancsestor(element, tree):
-    ancsestors = []
+    ancsestors = [element]
     root=tree
     if isInTree(element, tree):
         while root.value!=element:
@@ -107,7 +109,6 @@ def Ancsestor(element, tree):
             else:
                 root=root.left
     return ancsestors
-
 
 
 #intersect, difference, and equal set
@@ -128,10 +129,8 @@ def Difference(A,B):
     A=mergesort(A)
     B=mergesort(B)
     for i in A:
-        for j in B:
-            if i!=j:
-                if i not in newlist:
-                    newlist.append(i)
+        if i not in B:
+            newlist.append(i)
     return newlist
 
 def equalSet(A,B):
@@ -148,26 +147,29 @@ def equalSet(A,B):
 def isIn(element, A):
     p=3
     hash= makeHash(A,p)
-    if isEmpty(hash):
-        return False
+    if element in hash[element%p]:
+        return True
     else:
-        if element in dict[element%p]:
-            return True
+        return False
 
 def Insert(element, A):
     p=3
     hash= makeHash(A,p)
-    if element%p in hash.keys:
+    if (element%p) in hash.keys():
         hash[element%p].append(element)
     else:
         hash[element%p]=[element]
     return hash
 
 def Delete(element, A):
+    p=3
+    new=[]
+    hash= makeHash(A,p)
     if isIn(element, A):
-        p=3
-        hash= makeHash(A,p)
-        hash[element%p]-= element
+        for i in hash[element%p]:
+            if i!=element:
+                new.append(i)
+        hash[element%p]=new
     return hash
 
 
@@ -176,9 +178,58 @@ def Delete(element, A):
 def frequencyCount2(A):
     p=7
     hash=makeHash(A,p)
+    x=-1
+    newlist=[]
+    used=[]
+    for key in hash:
+        for value in hash[key]:
+            if value not in used:
+                used.append(value)
+                newlist.append([value,1])
+                x+=1
+            else:
+                newlist[x][1]+=1
+    return newlist
 
+
+#intersect, difference, and equal set using hash
+
+def Intersect2(A,B):
+    p=4
+    list=[]
+    A=makeHash(A,p)
+    B=makeHash(B,p)
+    for key in A:
+        for value in A[key]:
+            if isInHash(value, B, p):
+                list.append(value)
+    return list
+
+def Difference2(A,B):
+    p=4
+    list=[]
+    A=makeHash(A,p)
+    B=makeHash(B,p)
+    for key in A:
+        for value in A[i]:
+            if not isInHash(value, B, p):
+                list.append(value)
+    return list
+
+def equalSet2(A,B):
+    p=4
+    A.sort
+    B.sort
+    A=makeHash(A,p)
+    B=makeHash(B,p)
+    for i in range(p):
+        if A[i]==B[i]:
+            return True
+        else:
+            return False
 
 #code from lecture for tree
+
 def emptyTree():
     return {}
 
@@ -208,8 +259,8 @@ def isEmpty(tree):
 def isInTree(element, tree):
    if isEmpty(tree):  return False
    if element == root(tree): return True
-   if element < root(tree):  return isIn(element,left(tree))
-   else: return isIn(element,right(tree))
+   if element < root(tree):  return isInTree(element,left(tree))
+   else: return isInTree(element,right(tree))
 
 def inOrderTravesal(tree):
     if ( not isEmpty(tree) ):
@@ -217,18 +268,69 @@ def inOrderTravesal(tree):
         print(root(tree))
         inOrderTravesal(right(tree))
 
+
 #code from lecture for merge sort
+
 def leftHalf(A):
    return A[:len(A)//2]
 
 def rightHalf(A):
    return A[len(A)//2:]
 
+
 #making hash
+
 def makeHash(lst, p):
     dict={}
+    for i in range(p):
+        dict[i]=[]
     for i in lst:
-        if i%p in dict.keys:
             dict[i%p].append(i)
-        else:
-            dict[i%p]=[i]
+    return dict
+
+def isInHash(element, A, p):
+    if isEmpty(hash):
+        return False
+    else:
+        if element in dict[element%p]:
+            return True
+
+
+# Testing
+
+# list=[[1],[1, 2, 3, 4, 5, 6, 7, 8, 9, 10],[7, 6, 6, 3, 9, 3, 2, 4, 8, 10, 7, 5, 1, 5, 1, 5, 3, 2, 3, 3, 3, 3, 1, 2]]
+# for i in list:
+#     print(mergesort(i))
+
+# list=[[1],[1, 2, 3, 4, 5, 6, 7, 8, 9, 10],[5, 3, 7, 5, 5, 1, 2, 10, 3, 3, 3, 2, 3, 4, 7, 1, 1],[1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1]]
+# for i in list:
+#     print(frequencyCount(i))
+
+# list1=[[],[1,2,3],[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]
+# list2=[[],[],[10, 9, 8, 7, 6, 5, 4, 3, 2, 1]]
+# for i in range(len(list1)):
+#     print(Intersect(list1[i],list2[i]))
+#     print(equalSet(list1[i],list2[i]))
+#     print(Difference(list1[i],list2[i]))
+
+# list=[[7, 6, 6, 3, 9, 3, 2, 4, 8, 10, 7, 5, 1, 5, 1, 5, 3, 2, 3, 3, 3, 3, 1, 2],[1, 2, 3, 4, 5, 6, 7, 8, 9, 10],[1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1]]
+# for i in list:
+#     print(Insert(5,i))
+#     print(isIn(9,i))
+#     print(Delete(4,i))
+
+# list=[[1],[1, 2, 3, 4, 5, 6, 7, 8, 9, 10],[5, 3, 7, 5, 5, 1, 2, 10, 3, 3, 3, 2, 3, 4, 7, 1, 1],[1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1]]
+# for i in list:
+#     print(frequencyCount2(i))
+
+# list1=[[],[1,2,3],[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]
+# list2=[[],[],[10, 9, 8, 7, 6, 5, 4, 3, 2, 1]]
+# for i in range(len(list1)):
+#     print(Intersect2(list1[i],list2[i]))
+#     print(equalSet2(list1[i],list2[i]))
+#     print(Difference2(list1[i],list2[i]))
+
+# T = makeTree(5,makeTree(10,makeTree(11,leaf(20),emptyTree()),leaf(8)),makeTree(7,emptyTree(),leaf(3)))
+# print(Ancsestor(20,T))
+# print(Descendant(10,T))
+# print(T)
