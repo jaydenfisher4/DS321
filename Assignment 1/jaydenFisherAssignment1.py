@@ -211,7 +211,7 @@ def Difference2(A,B):
     A=makeHash(A,p)
     B=makeHash(B,p)
     for key in A:
-        for value in A[i]:
+        for value in A[key]:
             if not isInHash(value, B, p):
                 list.append(value)
     return list
