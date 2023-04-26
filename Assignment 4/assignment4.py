@@ -269,18 +269,41 @@ print('Problem 5.a')
 ## course.
 
 ## Your Python code for this problem must go here
-print_Answer(any(Student(x) and hasMajor(x, 'Computer Science') and Enroll(x, 'Databases') for x in student))
+ans=False
+for p in P:
+    if Student(p):
+        for prof in P:
+            if Professor(prof) and Knows(p, prof):
+                for c in C:
+                    if Teaches(prof, c) and c == 'Databases':
+                        ans=True
+print(ans)
 
+print('Problem 6.a')
 ## Each course taught by professor ‘Anna’ is taken by at least two
 ## students.
 
 ## Your Python code for this problem must go here
+ans=False
+for c in C:
+    if Teaches(prof, c) and prof == 'Anna':
+        e = 0
+        for p1 in P:
+            if Student(p1) and Enroll(p1, c):
+                for p2 in P:
+                    if Student(p2) and Enroll(p2, c) and p1 != p2:
+                        e += 1
+                        if e>=2:
+                            ans=True
+print(ans)
 
 
 print('Problem 7.a')
 ## Find the majors of students who are enrolled in the course `Algorithms'
 
 ## Your Python code for this problem must go here
+ans = [x['m'] for x in hasmajor if x['p'] in [y['p'] for y in enroll if y['c'] == 'Algorithms']]
+print(ans)
 
 
 print('Problem 8.a')
@@ -288,21 +311,32 @@ print('Problem 8.a')
 ## professor ‘Emma’ or a course taught by professor ‘Arif' or by Professor 'Anna'.
 
 ## Your Python code for this problem must go here
-
+ans = [x['p1'] for x in knows if x['p2'] in
+          ([y['p'] for y in enroll if y['c'] in
+            [z['c'] for z in teaches if z['p'] == 'Emma' or z['p'] == 'Arif' or z['p'] == 'Anna']])
+         for x in knows if x['p1'] != x['p2']]
+print(set(ans))
 
 print('Problem 9.a')
 ## Find each pair of different students who both know a same professor
 ## who teaches the course ‘Databases’
 
 ## Your Python code for this problem must go here
+ans = []
+for k1 in knows:
+    for k2 in knows:
+        if k1['p2'] == k2['p1'] and k1['p1'] != k2['p2']:
+            for prof in teaches:
+                if prof['c'] == 'Databases' and prof['p'] in [k1['p1'], k1['p2'], k2['p1'], k2['p2']]:
+                    ans.append((k1['p1'], k2['p2']))
 
+print(set(ans))
 
 print('Problem 10.a')
 ## Find each professor who only teaches courses taken by all students
 ## who major in `DataScience'
 
 ## Your Python code for this problem must go here
-
 
 
 print('Problem 11.a')

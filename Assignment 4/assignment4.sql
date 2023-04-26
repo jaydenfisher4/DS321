@@ -334,7 +334,7 @@ $$ language sql;
 -- Your SQL code for this problem must go here
 SELECT DISTINCT p1.*
 FROM P p1, P p2, C c
-WHERE student(p1) AND professor(p2) AND knows(p1, p2) AND teaches(p2, c) AND c = 'Databases'
+WHERE student(p1.P) AND professor(p2.P) AND knows(p1.P, p2.P) AND teaches(p2.P, c) AND c = 'Databases'
 
 \qecho 'Problem 6.a'
 -- Each course taught by professor ‘Anna’ is taken by at least two
@@ -343,11 +343,11 @@ WHERE student(p1) AND professor(p2) AND knows(p1, p2) AND teaches(p2, c) AND c =
 -- Your SQL code for this problem must go here
 SELECT c.*
 FROM C c, P p1, P p2
-WHERE teaches(c, 'Anna') AND professor('Anna')
+WHERE teaches('Anna', c) AND professor('Anna')
 AND EXISTS (
 SELECT 1
 FROM P p1, P p2
-WHERE p1 <> p2 AND student(p1) AND student(p2) AND enroll(p1, c) AND enroll(p2, c)
+WHERE p1 <> p2 AND student(p1.P) AND student(p2.P) AND enroll(p1.P, c) AND enroll(p2.P, c)
 )
 
 
@@ -373,10 +373,10 @@ WHERE c = 'Algorithms' AND enroll(p, c)
 -- Your SQL code for this problem must go here
 SELECT DISTINCT p1.*
 FROM P p1, P p2, C c
-WHERE knows(p1, p2) AND (
-(teaches(c, 'Emma') AND professor('Emma') AND teaches(p2, c))
-OR (teaches(c, 'Arif') AND professor('Arif') AND teaches(p2, c))
-OR (teaches(c, 'Anna') AND professor('Anna') AND teaches(p2, c))
+WHERE knows(p1.P, p2.P) AND (
+(teaches('Emma', c) AND professor('Emma') AND enroll(p2.P, c))
+OR (teaches('Arif', c) AND professor('Arif') AND enroll(p2.P, c))
+OR (teaches('Anna', c) AND professor('Anna') AND enroll(p2.P, c))
 )
 
 
@@ -385,9 +385,9 @@ OR (teaches(c, 'Anna') AND professor('Anna') AND teaches(p2, c))
 -- who teaches the course ‘Databases’
 
 -- Your SQL code for this problem must go here
-SELECT DISTINCT p1., p2.
-FROM P p1, P p2
-WHERE p1 <> p2 AND knows(p1, professor) AND knows(p2, professor) AND teaches(professor, 'Databases')
+SELECT DISTINCT p1.P, p2.P
+FROM P p1, P p2, P professor
+WHERE p1 <> p2 AND knows(p1.P, professor.P) AND knows(p2.P, professor.P) AND teaches(professor.P, 'Databases')
 
 
 
@@ -404,13 +404,13 @@ FROM C c
 WHERE EXISTS (
 SELECT 1
 FROM P p1
-WHERE hasMajor(p1, 'DataScience') AND NOT EXISTS (
+WHERE hasMajor(p1.P, 'DataScience') AND NOT EXISTS (
 SELECT 1
 FROM C c2
-WHERE c2 = c AND NOT EXISTS (
+WHERE c2.C = c AND NOT EXISTS (
 SELECT 1
 FROM P p2
-WHERE enroll(p2, c2) AND hasMajor(p2, 'DataScience')
+WHERE enroll(p2.P, c2.C) AND hasMajor(p2.P, 'DataScience')
 )
 )
 )
@@ -423,12 +423,12 @@ WHERE enroll(p2, c2) AND hasMajor(p2, 'DataScience')
 
 -- Your SQL code for this problem must go here
 SELECT DISTINCT p.*
-FROM P p
-WHERE professor(p) AND NOT EXISTS (
+FROM P p3
+WHERE professor(p3.P) AND NOT EXISTS (
 SELECT 1
-FROM P p1, P p2, M m1, M m2
-WHERE p1 <> p2 AND hasMajor(p1, 'DataScience') AND hasMajor(p2, 'Chemistry')
-AND enroll(p1, c) AND enroll(p2, c) AND knows(p, p1) AND knows(p, p2)
+FROM P p1, P p2, C c
+WHERE p1 <> p2 AND hasMajor(p1.P, 'DataScience') AND hasMajor(p2.P, 'Chemistry')
+AND enroll(p1.P, c) AND enroll(p2.P, c) AND knows(p3.P, p1.P) AND knows(p3.P, p2.P)
 )
 
 
@@ -438,13 +438,13 @@ AND enroll(p1, c) AND enroll(p2, c) AND knows(p, p1) AND knows(p, p2)
 -- take none of the courses taught by professor `Pedro'
 
 -- Your SQL code for this problem must go here
-SELECT DISTINCT p1., p2.
+SELECT DISTINCT p1.P, p2.P
 FROM P p1, P p2, M m
-WHERE p1 <> p2 AND hasMajor(p1, m) AND hasMajor(p2, m)
+WHERE p1 <> p2 AND hasMajor(p1.P, m) AND hasMajor(p2.P, m)
 AND NOT EXISTS (
 SELECT 1
 FROM C c, P p3
-WHERE teaches('Pedro', c) AND teaches(p3, c) AND (enroll(p1, c) OR enroll(p2, c))
+WHERE teaches('Pedro', c) AND teaches(p3.P, c) AND (enroll(p1.P, c) OR enroll(p2.P, c))
 )
 
 -- !!!!!!!!!!!!!!!!!
